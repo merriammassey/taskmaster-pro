@@ -33,7 +33,7 @@ var loadTasks = function() {
 
   // loop over object properties
   $.each(tasks, function(list, arr) {
-    console.log(list, arr);
+//    console.log(list, arr);
     // then loop over sub-array
     arr.forEach(function(task) {
       createTask(task.text, task.date, list);
@@ -45,13 +45,116 @@ var saveTasks = function() {
   localStorage.setItem("tasks", JSON.stringify(tasks));
 };
 
+// added in 5.1.6 to delegate clicks on all tr elements to the parent tbody element
+$(".list-group").on("click", "p", function() {
+  // console.log("<p> was clicked");
+  // convert this into a jQuery object with $
+//  var text = $(this).text(); 
+//  console.(text); 
+  var text = $(this)
+  .text()
+  .trim();
+
+// create new <textarea> element
+  var textInput = $("<textarea>")
+  .addClass("form-control")
+  .val(text);
+
+//append it by swapping it for <p> element
+  $(this).replaceWith(textInput);
+  //highlight the input box by putting it in focus
+  textInput.trigger("focus"); 
+  
+  // save without a save button automatically when out of focus
+  $(".list-group").on("blur", "textarea", function() {
+    // get the textarea's current value/text
+    var text = $(this)
+    .val()
+    .trim();
+
+    // get the parent ul's id attribute
+    var status = $(this)
+    .closest(".list-group")
+    .attr("id")
+    .replace("list-", "");
+
+    // get the task's position in the list of other li elements
+    var index = $(this)
+    .closest(".list-group-item")
+    .index();
+
+    //use variable names as placeholders since nothing has been entered yet
+    tasks[status][index].text = text;
+    saveTasks();
+
+    // Turn the text area back into p element
+    // recreate p element
+    var taskP = $("<p>")
+    .addClass("m-1")
+    .text(text);
+    // replace textarea with p element
+    $(this).replaceWith(taskP);
+      });
 
 
+// also added in module 5 - 5.1. 7 - to edit date on click
+// due date was clicked
+$(".list-group").on("click", "span", function() {
+  // get current text
+  var date = $(this)
+    .text()
+    .trim();
 
-// modal was triggered
-$("#task-form-modal").on("show.bs.modal", function() {
-  // clear values
-  $("#modalTaskDescription, #modalDueDate").val("");
+  // create new input element
+  var dateInput = $("<input>")
+    .attr("type", "text")
+    .addClass("form-control")
+    .val(date);
+
+  // swap out elements
+  $(this).replaceWith(dateInput);
+
+  // automatically focus on new element
+  dateInput.trigger("focus");
+});
+
+    // modal was triggered
+    $("#task-form-modal").on("show.bs.modal", function() {
+      // clear values
+      $("#modalTaskDescription, #modalDueDate").val("");
+});
+
+// convert date field back when blur event occurs
+// value of due date was changed
+$(".list-group").on("blur", "input[type='text']", function() {
+  // get current text
+  var date = $(this)
+    .val()
+    .trim();
+
+  // get the parent ul's id attribute
+  var status = $(this)
+    .closest(".list-group")
+    .attr("id")
+    .replace("list-", "");
+
+  // get the task's position in the list of other li elements
+  var index = $(this)
+    .closest(".list-group-item")
+    .index();
+
+  // update task in array and re-save to localstorage
+  tasks[status][index].date = date;
+  saveTasks();
+
+  // recreate span element with bootstrap classes
+  var taskSpan = $("<span>")
+    .addClass("badge badge-primary badge-pill")
+    .text(date);
+
+  // replace input with span element
+  $(this).replaceWith(taskSpan);
+});
 });
 
 // modal is fully visible
