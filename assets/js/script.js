@@ -6,6 +6,7 @@ var createTask = function(taskText, taskDate, taskList) {
   var taskSpan = $("<span>")
     .addClass("badge badge-primary badge-pill")
     .text(taskDate);
+    // add a p element 
   var taskP = $("<p>")
     .addClass("m-1")
     .text(taskText);
@@ -51,6 +52,7 @@ $(".list-group").on("click", "p", function() {
   // convert this into a jQuery object with $
 //  var text = $(this).text(); 
 //  console.(text); 
+// this is what we clicked on - p -
   var text = $(this)
   .text()
   .trim();
